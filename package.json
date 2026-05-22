@@ -1,0 +1,106 @@
+{
+  "id": "open-dinglogin",
+  "displayName": "open-dinglogin",
+  "version": "1.0.0",
+  "description": "UniApp UTS插件，实现Android、iOS平台钉钉授权登录功能，支持检查钉钉安装状态、拉起钉钉登录、处理授权回调等功能",
+  "keywords": [
+    "uts",
+    "dingtalk",
+    "login",
+    "oauth",
+    "android",
+    "ios",
+    "钉钉",
+    "登录",
+    "授权"
+  ],
+  "repository": "https://github.com/your-username/open-dinglogin",
+  "engines": {
+    "HBuilderX": "^3.6.8",
+    "uni-app": "^3.1.0",
+    "uni-app-x": "^3.1.0"
+  },
+  "dcloudext": {
+    "type": "uts",
+    "sale": {
+      "regular": {
+        "price": "0.00"
+      },
+      "sourcecode": {
+        "price": "0.00"
+      }
+    },
+    "contact": {
+      "qq": "",
+      "wechat": ""
+    },
+    "declaration": {
+      "ads": "无",
+      "data": "仅收集钉钉授权回调所需的authCode，不收集用户隐私信息",
+      "permissions": "网络访问权限、检查应用安装状态权限"
+    },
+    "npmurl": "",
+    "darkmode": "支持",
+    "i18n": "-",
+    "widescreen": "-"
+  },
+  "uni_modules": {
+    "dependencies": [],
+    "encrypt": [],
+    "platforms": {
+      "cloud": {
+        "tcb": "-",
+        "aliyun": "-",
+        "alipay": "-"
+      },
+      "client": {
+        "uni-app": {
+          "vue": {
+            "vue2": "v",
+            "vue3": "v"
+          },
+          "web": {
+            "safari": "-",
+            "chrome": "-"
+          },
+          "app": {
+            "vue": "v",
+            "nvue": "-",
+            "android": "v",
+            "ios": "-",
+            "harmony": "-"
+          },
+          "mp": {
+            "weixin": "-",
+            "alipay": "-",
+            "toutiao": "-",
+            "baidu": "-",
+            "kuaishou": "-",
+            "jd": "-",
+            "harmony": "-",
+            "qq": "-",
+            "lark": "-"
+          },
+          "quickapp": {
+            "huawei": "-",
+            "union": "-"
+          }
+        },
+        "uni-app-x": {
+          "web": {
+            "safari": "-",
+            "chrome": "-"
+          },
+          "app": {
+            "android": "v",
+            "ios": "-",
+            "harmony": "-"
+          },
+          "mp": {
+            "weixin": "-"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+/* 钉钉登录UTS插件错误处理规范 */
+import { DingTalkLoginErrorCode, DingTalkLoginFail } from "./interface.uts"
+/**
+ * 错误主题
+ * 注意：错误主题一般为插件名称，每个组件不同，需要使用时请更改。
+ * [可选实现]
+ */
+export const UniErrorSubject = 'open-dinglogin';
+
+
+/**
+ * 错误信息
+ * @UniError
+ * [可选实现]
+ */
+export const DingTalkLoginErrors : Map<DingTalkLoginErrorCode, string> = new Map([
+  /**
+   * 错误码及对应的错误信息
+   */
+  [9010001, '钉钉应用未安装，请先安装钉钉客户端'],
+  [9010002, '用户取消了授权登录'],
+  [9010003, '钉钉授权登录失败'],
+  [9010004, '网络连接错误，请检查网络设置'],
+  [9010005, '参数错误，请检查AppKey是否正确'],
+  [9010006, '应用配置错误，请检查钉钉开放平台配置'],
+  [9010007, '系统内部错误，请重试'],
+  [9010008, '授权回调处理失败'],
+]);
+
+
+/**
+ * 错误对象实现
+ */
+export class DingTalkLoginFailImpl extends UniError implements DingTalkLoginFail {
+
+  /**
+   * 错误对象构造函数
+   */
+  constructor(errCode : DingTalkLoginErrorCode) {
+    super();
+    this.errSubject = UniErrorSubject;
+    this.errCode = errCode;
+    this.errMsg = DingTalkLoginErrors.get(errCode) ?? "";
+  }
+}

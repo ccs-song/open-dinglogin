@@ -1,0 +1,32 @@
+{
+  "dependencies": ["com.alibaba.android:ddopenauth:1.5.0.10"],
+  "minSdkVersion": "21",
+  "permissions": [
+    "android.permission.INTERNET",
+    "android.permission.ACCESS_NETWORK_STATE",
+    "android.permission.QUERY_ALL_PACKAGES"
+  ],
+  "activities": [
+    {
+      "name": "DDAuthActivity",
+      "exported": "true",
+      "launchMode": "singleTop"
+    }
+  ],
+  "intentFilters": [
+    {
+      "action": "android.intent.action.VIEW",
+      "category": ["android.intent.category.DEFAULT", "android.intent.category.BROWSABLE"],
+      "data": {
+        "scheme": "dingtalk"
+      }
+    },
+    {
+      "action": "android.intent.action.VIEW",
+      "category": ["android.intent.category.DEFAULT", "android.intent.category.BROWSABLE"],
+      "data": {
+        "scheme": "dingtalkclient"
+      }
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+import { UTSiOS, UTSiOSHookProxy } from 'DCloudUTSFoundation'
+import { UIApplication, UIViewController } from 'UIKit'
+import { URL, NSUUID } from 'Foundation'
+import {
+  ADTBaseResp,
+  ADTOpenAuthAPI,
+  ADTOpenAuthAPIDelegate,
+  ADTOpenAuthReq,
+  ADTOpenAuthResp
+} from 'ADTOpenAuthSDK'
+
+import type { AuthLoginOptions, AuthLoginResult } from '../interface.uts'
+
+let didRegister = false
+let authResolve: ((res: AuthLoginResult) => void) | null = null
+let authReject: ((res: AuthLoginResult) => void) | null = null
+let lastBundleId = ''
+let registeredAppId = ''
+let registeredBundleId = ''
+
+function normalizeString(value: string | null): string {
+  if (value == null) {
+    return ''
+  }
+  return value as string
+}
+
+function ensureRegistered(appId: string, bundleId: string): boolean {
+  if (didRegister && registeredAppId == appId && registeredBundleId == bundleId) {
+    return true
+  }
+  lastBundleId = bundleId
+  registeredAppId = appId
+  registeredBundleId = bundleId
+  console.log('bundleId: ' + bundleId)
+  if (bundleId == null || bundleId.length == 0 || appId.length == 0) {
+    return false
+  }
+  const ok = ADTOpenAuthAPI.registerApp(appId, identifier=bundleId)
+  didRegister = ok
+  return ok
+}
+
+function clearCallbacks() {
+  authResolve = null
+  authReject = null
+}
+
+class DingTalkAuthDelegate implements ADTOpenAuthAPIDelegate {
+  onResp(resp: ADTBaseResp): void {
+    const resolve = authResolve
+    const reject = authReject
+
+    const authResp = resp as ADTOpenAuthResp
+    if (authResp.respCode == 0) {
+      resolve?.({
+        errMsg: 'authLogin:ok',
+        authCode: authResp.authCode,
+        state: authResp.state
+      })
+    } else if (authResp.respCode == -2) {
+      reject?.({
+        errMsg: 'authLogin:fail user cancel'
+      })
+    } else {
+      const message = authResp.respMessage != null ? authResp.respMessage : ''
+      reject?.({
+        errMsg: 'authLogin:fail ' + message
+      })
+    }
+
+    clearCallbacks()
+  }
+}
+
+const authDelegate = new DingTalkAuthDelegate()
+
+function handleOpenURL(url: URL | null): boolean {
+  if (url == null) {
+    return false
+  }
+  return ADTOpenAuthAPI.handleOpen(url, delegate=authDelegate)
+}
+
+export class DingTalkHook implements UTSiOSHookProxy {
+  applicationDidFinishLaunchingWithOptions(
+    application: UIApplication | null,
+    launchOptions: Map<string, any> | null = null
+  ): boolean {
+    return true
+  }
+
+  applicationHandleOpenURL(application: UIApplication | null, url: URL | null): boolean {
+    return handleOpenURL(url)
+  }
+
+  applicationOpenURLOptions(
+    app: UIApplication | null,
+    url: URL,
+    options: Map<string, any> | null = null
+  ): boolean {
+    return handleOpenURL(url)
+  }
+}
+
+export function authLogin(options: AuthLoginOptions): Promise<AuthLoginResult> {
+  return new Promise((resolve, reject) => {
+    if (options == null) {
+      reject({ errMsg: 'authLogin:fail invalid options' })
+      return
+    }
+
+    const appId: string = normalizeString(options.appId)
+    const bundleId: string = normalizeString(options.bundleId)
+    const redirectUrl: string = normalizeString(options.redirectUrl)
+    const responseType: string = normalizeString(options.responseType)
+    const scope: string = normalizeString(options.scope)
+    const prompt: string = normalizeString(options.prompt)
+    const state: string = normalizeString(options.state)
+    if (
+      appId.length == 0 || bundleId.length == 0 || redirectUrl.length == 0 ||
+      responseType.length == 0 || scope.length == 0 || prompt.length == 0
+    ) {
+      reject({ errMsg: 'authLogin:fail invalid options' })
+      return
+    }
+
+    if (!ensureRegistered(appId, bundleId)) {
+      const bundleInfo = lastBundleId.length > 0 ? lastBundleId : 'empty'
+      reject({ errMsg: 'authLogin:fail register app failed, bundleId=' + bundleInfo })
+      return
+    }
+
+    if (!ADTOpenAuthAPI.isDingTalkInstalled()) {
+      reject({ errMsg: 'authLogin:fail dingtalk not installed' })
+      return
+    }
+
+    authResolve = resolve
+    authReject = reject
+
+    const req = new ADTOpenAuthReq()
+    req.redirectUrl = redirectUrl
+    req.responseType = responseType
+    req.scope = scope
+    req.prompt = prompt
+    req.state = state.length > 0 ? state : new NSUUID().uuidString
+
+    const viewController: UIViewController = UTSiOS.getCurrentViewController()
+    const ok = ADTOpenAuthAPI.send(req, on=viewController)
+    if (!ok) {
+      reject({ errMsg: 'authLogin:fail sendReq failed' })
+      clearCallbacks()
+    }
+  })
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+	package="uts.sdk.modules.openDinglogin">
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+	<application>
+		<activity android:name="uts.sdk.modules.openDinglogin.DDAuthActivity" android:launchMode="singleTop"
+			android:taskAffinity="${applicationId}"
+			android:exported="true" />
+		<activity-alias
+			android:name="${applicationId}.ddauth.DDAuthActivity"
+			android:exported="true"
+			android:launchMode="singleTop"
+			android:targetActivity="uts.sdk.modules.openDinglogin.DDAuthActivity" />
+	</application>
+</manifest>

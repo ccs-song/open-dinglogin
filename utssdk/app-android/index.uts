@@ -1,0 +1,37 @@
+import type { AuthLoginOptions, AuthLoginResult } from '../interface.uts'
+import { DingTalkAuthNative } from 'uts.sdk.modules.openDinglogin'
+
+/**
+ * 调用钉钉登录
+ */
+export async function authLogin(options: AuthLoginOptions): Promise<AuthLoginResult> {
+  try {
+    const { appId, redirectUrl, responseType, scope, prompt, state } = options
+    if (
+      appId.length == 0 || redirectUrl.length == 0 || responseType.length == 0 ||
+      scope.length == 0 || prompt.length == 0
+    ) {
+      return { errMsg: 'authLogin:fail invalid options' }
+    }
+
+    const safeState = state != null ? state : ''
+    const kotlinResult = await DingTalkAuthNative.authLoginKotlin(
+      appId,
+      redirectUrl,
+      responseType,
+      scope,
+      prompt,
+      safeState
+    )
+    
+    return {
+      errMsg: kotlinResult.errMsg,
+      authCode: kotlinResult.authCode,
+      state: kotlinResult.state
+    }
+  } catch (error: any) {
+    return {
+      errMsg: 'authLogin:fail unknown error'
+    }
+  }
+}

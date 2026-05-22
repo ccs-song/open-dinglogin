@@ -1,0 +1,20 @@
+export type AuthLoginResult = {
+  errMsg: string
+  authCode?: string
+  state?: string
+}
+
+export type AuthLoginOptions = {
+  appId: string
+  bundleId?: string
+  redirectUrl: string
+  responseType: string
+  scope: string
+  prompt: string
+  state?: string
+}
+
+/**
+ * 调用钉钉登录
+ */
+export function authLogin(options: AuthLoginOptions): Promise<AuthLoginResult>
